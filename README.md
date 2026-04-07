@@ -74,20 +74,35 @@ transport: stdio
 
 ### Typical Flow
 
-```
-1. spawn("eas build --platform ios --profile production")
-   → returns sessionId + initial screen
+```mermaid
+sequenceDiagram
+    participant Agent as AI Agent
+    participant MCP as interactive-cli
+    participant PTY as Process (PTY)
 
-2. get_screen(sessionId)
-   → "Select a build profile: ❯ development  staging  production"
+    Agent->>MCP: spawn("eas build --platform ios")
+    MCP->>PTY: Start process in PTY
+    PTY-->>MCP: Initial output
+    MCP-->>Agent: sessionId + screen
 
-3. send_keys(sessionId, ["down", "down", "enter"])
-   → "✔ Selected: production"
+    Agent->>MCP: get_screen(sessionId)
+    MCP-->>Agent: "Select profile: ❯ dev staging prod"
 
-4. wait_for(sessionId, "Build complete|error|failed", timeoutMs: 600000)
-   → blocks until build finishes, returns screen
+    Agent->>MCP: send_keys(["down","down","enter"])
+    MCP->>PTY: ↓ ↓ ⏎
+    PTY-->>MCP: "✔ Selected: production"
+    MCP-->>Agent: updated screen
 
-5. close(sessionId)
+    Agent->>MCP: wait_for("Build complete|error", 600s)
+    loop Every 1s
+        MCP->>PTY: check output
+    end
+    PTY-->>MCP: "Build complete"
+    MCP-->>Agent: matched + screen
+
+    Agent->>MCP: close(sessionId)
+    MCP->>PTY: SIGTERM
+    MCP-->>Agent: final screen + exit code
 ```
 
 ### `spawn`
@@ -181,24 +196,20 @@ Pre-built prompt templates for common flows (appear as slash commands in Claude 
 
 ## How It Works
 
-```
-Agent ←→ MCP Protocol (stdio) ←→ interactive-cli server
-                                        │
-                                  ┌─────┴──────┐
-                                  │   Session   │
-                                  │   Manager   │
-                                  └─────┬──────┘
-                                        │
-                                  ┌─────┼──────┐
-                                  │     │      │
-                               node-pty xterm  Truncation
-                               (PTY)  (render) (80K limit)
+```mermaid
+graph LR
+    A[AI Agent] <-->|MCP Protocol| B[interactive-cli server]
+    B --> C[Session Manager]
+    C --> D[node-pty<br/><i>real PTY</i>]
+    C --> E[xterm headless<br/><i>screen render</i>]
+    C --> F[Truncation<br/><i>80K limit</i>]
+    D <--> G[Child Process<br/>ssh, eas, python...]
 ```
 
 - **node-pty** spawns a real pseudo-terminal, so the child process thinks it's talking to a human
-- **xterm headless** maintains a virtual terminal buffer that renders ANSI escape sequences into a clean 2D text grid
-- Output is truncated at 80K characters (MCP clients like Claude Code cap at 100K) using smart middle-truncation that preserves the start and end
-- Tool annotations (`readOnlyHint`, `destructiveHint`) tell Claude Code which tools are safe to run in parallel and which need permission
+- **xterm headless** maintains a virtual terminal buffer that renders ANSI sequences into a clean 2D text grid
+- Output is truncated at 80K chars (MCP clients like Claude Code cap at 100K) with smart middle-truncation preserving start and end
+- Tool annotations (`readOnlyHint`, `destructiveHint`) tell the client which tools are safe to run in parallel and which need permission
 
 ## Requirements
 
