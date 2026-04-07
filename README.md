@@ -1,40 +1,29 @@
 # interactive-cli
 
-MCP server that gives AI coding agents the ability to interact with interactive CLI processes. Spawn a real PTY, see the terminal screen as clean text via xterm headless, send keystrokes, navigate TUI menus, and wait for patterns — all through the Model Context Protocol.
+MCP server that lets AI coding agents interact with interactive CLI processes. Uses a real PTY + [xterm headless](https://www.npmjs.com/package/@xterm/headless) to render terminal output as clean text — no ANSI escape soup.
 
-**Built for [Claude Code](https://claude.ai/code)**, works with any MCP-compatible agent (Cursor, Windsurf, etc.).
+Works with [Claude Code](https://claude.ai/code), Cursor, Windsurf, or any MCP-compatible client.
 
-## The Problem
+## Why
 
-AI coding agents can run shell commands, but they can't interact with processes that ask questions:
+AI agents can run shell commands, but they choke on anything interactive:
 
 ```
 $ eas build --platform ios
 ✔ Select a build profile › (waiting for input...)
 ```
 
-The agent gets stuck. You have to take over manually.
+This MCP server bridges that gap — spawn the process, read the screen, send keystrokes.
 
-## The Solution
-
-`interactive-cli` gives your agent a real terminal it can see and control:
-
-```
-Agent: spawn("eas build --platform ios")
-→ Screen shows: "Select a build profile: ❯ development  staging  production"
-
-Agent: send_keys(["down", "down", "enter"])
-→ Screen shows: "✔ Selected: production"
-
-Agent: wait_for("Build complete|error", timeoutMs: 300000)
-→ Waits up to 5 min, returns screen when pattern matches
-```
-
-## Install
+## Quick Start
 
 ### Claude Code
 
-Add to `~/.claude/settings.json`:
+```bash
+claude mcp add-json interactive-cli '{"command":"npx","args":["-y","@anthropic-tools/interactive-cli"]}'
+```
+
+Or add to `~/.claude/settings.json` manually:
 
 ```json
 {
@@ -47,7 +36,7 @@ Add to `~/.claude/settings.json`:
 }
 ```
 
-### From source
+### From Source
 
 ```bash
 git clone https://github.com/ohernandezdev/interactive-cli.git
@@ -55,153 +44,166 @@ cd interactive-cli
 npm install && npm run build
 ```
 
-```json
-{
-  "mcpServers": {
-    "interactive-cli": {
-      "command": "node",
-      "args": ["/path/to/interactive-cli/dist/index.js"]
-    }
-  }
-}
+```bash
+claude mcp add-json interactive-cli '{"command":"node","args":["/absolute/path/to/interactive-cli/dist/index.js"]}'
 ```
 
-## Tools (9)
+### Other MCP Clients
 
-### `spawn` — Start Interactive Process
-Start a command in a real PTY with virtual terminal rendering.
-
-```
-spawn({ command: "eas build --platform ios", cwd: "/path/to/mobile" })
-→ { sessionId: "s1", screen: "...", alive: true }
-```
-
-| Param | Type | Default | Description |
-|-------|------|---------|-------------|
-| `command` | string | required | Full command to run |
-| `cwd` | string | cwd | Working directory |
-| `env` | object | {} | Extra environment variables |
-| `cols` | number | 120 | Terminal width |
-| `rows` | number | 30 | Terminal height |
-| `waitMs` | number | 2000 | Ms to wait for initial output |
-
-### `send_input` — Type Text
-Send text input. Appends Enter by default.
+Point your client's MCP config at:
 
 ```
-send_input({ sessionId: "s1", text: "y" })
-send_input({ sessionId: "s1", text: "password123", pressEnter: false })
+command: node
+args: ["/path/to/interactive-cli/dist/index.js"]
+transport: stdio
 ```
 
-### `send_keys` — Navigate Menus & Send Special Keys
-Send one or more keys in sequence. Supports 50+ keys including arrows, function keys, ctrl combos.
+## Tools
+
+| Tool | Description | Read-only |
+|------|-------------|-----------|
+| `spawn` | Start an interactive process in a PTY | No |
+| `send_input` | Type text (appends Enter by default) | No |
+| `send_keys` | Send special keys in sequence (arrows, ctrl combos, etc.) | No |
+| `get_screen` | Capture current terminal screen, optional regex search | Yes |
+| `wait_for` | Block until a regex pattern appears in output | No |
+| `wait_for_exit` | Block until the process exits | No |
+| `resize` | Change terminal dimensions | No |
+| `list_sessions` | List all active sessions | Yes |
+| `close` | Kill process, clean up session | No |
+
+### Typical Flow
 
 ```
-send_keys({ sessionId: "s1", keys: ["down", "down", "enter"] })
-send_keys({ sessionId: "s1", keys: ["ctrl+c"] })
+1. spawn("eas build --platform ios --profile production")
+   → returns sessionId + initial screen
+
+2. get_screen(sessionId)
+   → "Select a build profile: ❯ development  staging  production"
+
+3. send_keys(sessionId, ["down", "down", "enter"])
+   → "✔ Selected: production"
+
+4. wait_for(sessionId, "Build complete|error|failed", timeoutMs: 600000)
+   → blocks until build finishes, returns screen
+
+5. close(sessionId)
 ```
 
-**Available keys:** `enter`, `tab`, `escape`, `space`, `up`, `down`, `left`, `right`, `ctrl+c`, `ctrl+d`, `ctrl+z`, `ctrl+l`, `ctrl+a`, `ctrl+e`, `ctrl+r`, `ctrl+w`, `ctrl+u`, `ctrl+k`, `ctrl+p`, `ctrl+n`, `backspace`, `delete`, `home`, `end`, `page_up`, `page_down`, `f1`-`f12`, `y`, `n`, `0`-`9`
+### `spawn`
 
-### `get_screen` — Capture Terminal
-See exactly what a human would see. Optional regex search with context.
-
-```
-get_screen({ sessionId: "s1" })
-get_screen({ sessionId: "s1", search: "error|warning" })
-→ { screen: "...", cursor: { row: 5, col: 0 }, searchResults: "..." }
-```
-
-### `wait_for` — Smart Pattern Waiting
-Wait until output matches a pattern. Avoids polling with repeated get_screen calls.
-
-```
-wait_for({ sessionId: "s1", pattern: "Build complete|error", timeoutMs: 300000 })
-→ { matched: true, screen: "...", elapsed: "45s" }
+```typescript
+spawn({
+  command: "ssh user@server.com",   // full command string
+  cwd: "/path/to/project",          // optional working directory
+  env: { "NODE_ENV": "production" }, // optional extra env vars
+  cols: 120,                         // terminal width (default 120)
+  rows: 30,                          // terminal height (default 30)
+  waitMs: 3000,                      // ms to wait for initial output (default 2000)
+})
 ```
 
-### `wait_for_exit` — Wait for Process to Finish
-Wait until the process exits. Returns final screen and exit code.
+Commands run through your shell (`$SHELL` or `/bin/zsh`), so pipes, redirects, and builtins work.
 
+### `send_input`
+
+```typescript
+send_input({
+  sessionId: "s1",
+  text: "yes",           // text to type
+  pressEnter: true,      // append Enter (default true). false for password fields
+  waitMs: 2000,          // ms to wait for response (default 2000)
+})
 ```
-wait_for_exit({ sessionId: "s1", timeoutMs: 60000 })
-→ { alive: false, exitCode: 0, screen: "..." }
+
+### `send_keys`
+
+Send one or more keys in sequence with a small delay between each:
+
+```typescript
+send_keys({
+  sessionId: "s1",
+  keys: ["down", "down", "enter"],  // navigate menu
+  delayBetweenMs: 50,               // ms between keys (default 50)
+  waitMs: 1500,                     // ms to wait after last key (default 1500)
+})
 ```
 
-### `resize` — Resize Terminal
-Resize the PTY. Some TUIs reflow content on resize.
+**Supported keys:** `enter` `tab` `escape` `space` `up` `down` `left` `right` `backspace` `delete` `home` `end` `page_up` `page_down` `f1`–`f12` `ctrl+c` `ctrl+d` `ctrl+z` `ctrl+l` `ctrl+a` `ctrl+e` `ctrl+r` `ctrl+w` `ctrl+u` `ctrl+k` `ctrl+p` `ctrl+n` `y` `n` `0`–`9`
 
-### `list_sessions` — List Active Sessions
-Shows all sessions with uptime, status, and byte counts.
+### `get_screen`
 
-### `close` — Kill Session
-SIGTERM → SIGKILL → cleanup. Returns final screen.
+```typescript
+get_screen({
+  sessionId: "s1",
+  search: "error|warning",  // optional regex to highlight matching lines
+})
+// Returns: { screen, cursor: { row, col }, searchResults, stats }
+```
+
+### `wait_for`
+
+```typescript
+wait_for({
+  sessionId: "s1",
+  pattern: "\\$|#|>",      // regex to match (case-insensitive)
+  timeoutMs: 30000,         // max wait (default 30s)
+  intervalMs: 1000,         // check interval (default 1s)
+})
+// Returns: { matched: true/false, screen, elapsed }
+```
+
+### `wait_for_exit`
+
+```typescript
+wait_for_exit({
+  sessionId: "s1",
+  timeoutMs: 60000,
+})
+// Returns: { alive: false, exitCode: 0, screen }
+```
 
 ## Resources
 
-Sessions are exposed as MCP resources that Claude Code can read directly:
+Sessions are exposed as MCP resources:
 
-| URI | Description |
-|-----|-------------|
-| `interactive-cli://sessions` | List of all active sessions |
-| `interactive-cli://sessions/{id}/screen` | Live screen content for a session |
+- `interactive-cli://sessions` — JSON list of all sessions
+- `interactive-cli://sessions/{id}/screen` — live screen content
 
 ## Prompt Templates
 
-Pre-built flows available as slash commands in Claude Code:
+Pre-built prompt templates for common flows (appear as slash commands in Claude Code):
 
-| Prompt | Usage |
-|--------|-------|
-| `eas_build` | Interactive EAS build with credential handling |
-| `ssh_session` | SSH connection with command execution |
-| `repl_session` | Start Python, Node, psql, or any REPL |
-| `docker_interactive` | Run an interactive Docker container |
+- **`eas_build`** — EAS build with credential handling
+- **`ssh_session`** — SSH connection with command execution
+- **`repl_session`** — Start a REPL (Python, Node, psql, etc.)
+- **`docker_interactive`** — Run an interactive Docker container
 
-## Claude Code Integration Details
-
-Optimized based on analysis of Claude Code's MCP consumption:
-
-- **Tool annotations**: `readOnlyHint` on read-only tools enables parallel execution. `destructiveHint` on mutating tools triggers permission checks.
-- **Output size**: Truncated at 80K chars (Claude Code limit is 100K) with smart middle-truncation preserving start/end.
-- **Screen rendering**: xterm headless converts raw ANSI into clean 2D text, eliminating escape sequence noise for the LLM.
-- **`_meta` fields**: Every result includes timing, tool name, and version for observability.
-- **Resource notifications**: `sendResourceListChanged()` on session close keeps resource cache fresh.
-- **50+ key types**: Full keyboard support including function keys, ctrl combos, home/end, page up/down.
-
-## Architecture
+## How It Works
 
 ```
-AI Agent ←→ MCP Protocol ←→ interactive-cli MCP server
-                                    │
-                          ┌─────────┼──────────┐
-                          │         │          │
-                       node-pty   xterm     Resources
-                       (real PTY) (render)  (sessions)
-                          │         │          │
-                          └─────────┼──────────┘
-                                    │
-                              ┌─────┴─────┐
-                              │  Session   │
-                              │  Manager   │
-                              └───────────┘
+Agent ←→ MCP Protocol (stdio) ←→ interactive-cli server
+                                        │
+                                  ┌─────┴──────┐
+                                  │   Session   │
+                                  │   Manager   │
+                                  └─────┬──────┘
+                                        │
+                                  ┌─────┼──────┐
+                                  │     │      │
+                               node-pty xterm  Truncation
+                               (PTY)  (render) (80K limit)
 ```
 
-## Comparison with Alternatives
+- **node-pty** spawns a real pseudo-terminal, so the child process thinks it's talking to a human
+- **xterm headless** maintains a virtual terminal buffer that renders ANSI escape sequences into a clean 2D text grid
+- Output is truncated at 80K characters (MCP clients like Claude Code cap at 100K) using smart middle-truncation that preserves the start and end
+- Tool annotations (`readOnlyHint`, `destructiveHint`) tell Claude Code which tools are safe to run in parallel and which need permission
 
-| Feature | interactive-cli | interactive-shell-mcp | terminal-mcp | PiloTY |
-|---------|----------------|----------------------|--------------|--------|
-| Screen rendering (xterm) | ✅ | ✅ | ❌ | ✅ |
-| `wait_for` pattern | ✅ | ❌ | ❌ | ❌ |
-| `wait_for_exit` | ✅ | ❌ | ❌ | ❌ |
-| Batch `send_keys` (50+ keys) | ✅ | ❌ | ❌ | ❌ |
-| Screen search (regex) | ✅ | ✅ | ❌ | ❌ |
-| Cursor position | ✅ | ✅ | ❌ | ❌ |
-| MCP Resources | ✅ | ❌ | ❌ | ❌ |
-| MCP Prompts (templates) | ✅ | ❌ | ❌ | ❌ |
-| Tool annotations | ✅ | ❌ | ❌ | ❌ |
-| `_meta` observability | ✅ | ❌ | ❌ | ❌ |
-| Smart truncation (80K) | ✅ | ❌ | ❌ | ❌ |
-| Claude Code optimized | ✅ | ❌ | ❌ | ❌ |
+## Requirements
+
+- Node.js >= 18
+- macOS or Linux (node-pty uses native PTY)
 
 ## License
 
