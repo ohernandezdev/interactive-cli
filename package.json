@@ -28,7 +28,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/omarhernandezrey/interactive-cli.git"
+    "url": "git+https://github.com/ohernandezdev/interactive-cli.git"
   },
   "files": [
     "dist",

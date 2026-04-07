@@ -50,7 +50,7 @@ Add to `~/.claude/settings.json`:
 ### From source
 
 ```bash
-git clone https://github.com/omarhernandezrey/interactive-cli.git
+git clone https://github.com/ohernandezdev/interactive-cli.git
 cd interactive-cli
 npm install && npm run build
 ```
