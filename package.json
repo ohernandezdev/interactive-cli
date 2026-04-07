@@ -1,0 +1,51 @@
+{
+  "name": "@anthropic-tools/interactive-cli",
+  "version": "1.0.0",
+  "description": "MCP server that gives AI coding agents (Claude Code, Cursor, etc.) the ability to interact with interactive CLI processes via PTY — answering prompts, navigating menus, and controlling TUI applications.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "interactive-cli-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "interactive",
+    "cli",
+    "pty",
+    "terminal",
+    "claude-code",
+    "cursor",
+    "ai-agent",
+    "tui"
+  ],
+  "author": "Omar Hernandez",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omarhernandezrey/interactive-cli.git"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@xterm/headless": "^6.0.0",
+    "node-pty": "^1.1.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.2",
+    "typescript": "^6.0.2"
+  }
+}
