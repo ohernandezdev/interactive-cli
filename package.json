@@ -1,5 +1,5 @@
 {
-  "name": "@anthropic-tools/interactive-cli",
+  "name": "interactive-cli-mcp",
   "version": "1.1.0",
   "description": "MCP server that gives AI coding agents (Claude Code, Cursor, etc.) the ability to interact with interactive CLI processes via PTY — answering prompts, navigating menus, and controlling TUI applications.",
   "type": "module",

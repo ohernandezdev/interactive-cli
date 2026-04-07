@@ -20,7 +20,7 @@ This MCP server bridges that gap — spawn the process, read the screen, send ke
 ### Claude Code
 
 ```bash
-claude mcp add-json interactive-cli '{"command":"npx","args":["-y","@anthropic-tools/interactive-cli"]}'
+claude mcp add-json interactive-cli '{"command":"npx","args":["-y","interactive-cli-mcp"]}'
 ```
 
 Or add to `~/.claude/settings.json` manually:
@@ -30,7 +30,7 @@ Or add to `~/.claude/settings.json` manually:
   "mcpServers": {
     "interactive-cli": {
       "command": "npx",
-      "args": ["-y", "@anthropic-tools/interactive-cli"]
+      "args": ["-y", "interactive-cli-mcp"]
     }
   }
 }
