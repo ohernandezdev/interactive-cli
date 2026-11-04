@@ -147,6 +147,11 @@ The site stays vanilla (no React, no build): the React Bits effects are rebuilt 
   ("Give Codex a real terminal"), the tool card spotlight follows the pointer, the FAQ opens with plus-to-x; the dot grid reacted
   too faintly, so the dots near the pointer now grow to 2.8 px, reach 0.98 alpha and move out 8 px (frame checked).
 
+- Published (Omar: "súbelo"): main fast-forwarded 9c20458..c9bcca7; GitHub Pages enabled from main /docs, legacy build (as flint),
+  first build "built" in about 3.5 min. Live: https://ohernandezdev.github.io/interactive-cli/ answers 200, as do assets/og.png,
+  assets/icon.svg and the icon JSONs; the six-setup render of the live URL has 0 console errors and no horizontal scroll. The repo's
+  homepage now points at the site (was the npm page).
+
 ## Acceptance
 
 - docs/index.html renders with no console error in Chromium and WebKit, light and dark, at 1440 x 900, 393 x 852 and 320 x 640, no
@@ -158,7 +163,7 @@ The site stays vanilla (no React, no build): the React Bits effects are rebuilt 
 
 - [x] T1 docs/ site + README (delegated writer: two non-trivial files).
 - [x] T2 QA frames (coordinator), fixes.
-- [ ] T3 Omar's go: merge to main, enable Pages, check live.
+- [x] T3 Omar's go: merge to main, enable Pages, check live.
 
 ## Evidence
 
