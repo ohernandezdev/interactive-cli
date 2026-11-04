@@ -1,29 +1,48 @@
 # interactive-cli
 
-MCP server that lets AI coding agents interact with interactive CLI processes. Uses a real PTY + [xterm headless](https://www.npmjs.com/package/@xterm/headless) to render terminal output as clean text — no ANSI escape soup.
+An MCP server that runs commands in a real pseudo-terminal and hands your AI agent the rendered screen, so it can answer prompts, pick menu items and drive REPLs, SSH and installers the way you would.
 
-Works with [Claude Code](https://claude.ai/code), Cursor, Windsurf, or any MCP-compatible client.
+[![npm](https://img.shields.io/npm/v/interactive-cli-mcp)](https://www.npmjs.com/package/interactive-cli-mcp)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+![MCP server](https://img.shields.io/badge/MCP-server-3CCFBD)
+
+Site: **https://ohernandezdev.github.io/interactive-cli/**
+
+Works with Claude Code, Codex, Cursor, Windsurf, or any MCP client that speaks stdio.
 
 ## Why
 
-AI agents can run shell commands, but they choke on anything interactive:
+A shell tool sends a command and waits for it to finish. An interactive command never finishes: it waits for a person. The agent hangs, times out or kills it, and you end up typing the answer yourself.
 
 ```
-$ eas build --platform ios
-✔ Select a build profile › (waiting for input...)
+$ npm init
+package name: (my-app)
+waiting for input…
 ```
 
-This MCP server bridges that gap — spawn the process, read the screen, send keystrokes.
+interactive-cli bridges that gap. It spawns the process in a PTY, renders the screen with xterm headless (clean text, no ANSI escape soup), and lets the agent send input or keys and wait for patterns.
 
-## Quick Start
+## Install
+
+Requires Node 18 or later, on macOS or Linux.
 
 ### Claude Code
 
 ```bash
-claude mcp add-json interactive-cli '{"command":"npx","args":["-y","interactive-cli-mcp"]}'
+claude mcp add interactive-cli -- npx -y interactive-cli-mcp
 ```
 
-Or add to `~/.claude/settings.json` manually:
+### Codex CLI
+
+```bash
+codex mcp add interactive-cli -- npx -y interactive-cli-mcp
+```
+
+This writes `[mcp_servers.interactive-cli]` with `command = "npx"` and `args = ["-y", "interactive-cli-mcp"]` to `~/.codex/config.toml`.
+
+### Cursor
+
+Add this to `~/.cursor/mcp.json`:
 
 ```json
 {
@@ -36,43 +55,116 @@ Or add to `~/.claude/settings.json` manually:
 }
 ```
 
-### From Source
+### Any MCP client
+
+Point a stdio MCP client at:
+
+```bash
+npx -y interactive-cli-mcp
+```
+
+### From source
 
 ```bash
 git clone https://github.com/ohernandezdev/interactive-cli.git
 cd interactive-cli
 npm install && npm run build
+claude mcp add interactive-cli -- node /absolute/path/to/interactive-cli/dist/index.js
 ```
 
-```bash
-claude mcp add-json interactive-cli '{"command":"node","args":["/absolute/path/to/interactive-cli/dist/index.js"]}'
-```
+## What a session looks like
 
-### Other MCP Clients
-
-Point your client's MCP config at:
+An illustrative `eas build` session. The agent calls the tools; the server answers with the rendered screen.
 
 ```
-command: node
-args: ["/path/to/interactive-cli/dist/index.js"]
-transport: stdio
+spawn("eas build --platform ios")
+  ? Select a build profile ›
+  ❯ development
+    preview
+    production
+
+get_screen()
+  (same screen)
+
+send_keys(["down", "down", "enter"])
+  ✔ Selected profile: production
+  ? Do you want to log in to your Apple account? › (Y/n)
+
+send_input("y")
+  ✔ Logged in
+  Building…
+
+wait_for("Build complete|error", 600000)
+  ✔ Build complete
+
+close()
+  exit 0
 ```
+
+(`sessionId` is omitted above for brevity; every call after `spawn` takes the id that `spawn` returned.)
 
 ## Tools
 
-| Tool | Description | Read-only |
-|------|-------------|-----------|
-| `spawn` | Start an interactive process in a PTY | No |
-| `send_input` | Type text (appends Enter by default) | No |
-| `send_keys` | Send special keys in sequence (arrows, ctrl combos, etc.) | No |
-| `get_screen` | Capture current terminal screen, optional regex search | Yes |
-| `wait_for` | Block until a regex pattern appears in output | No |
-| `wait_for_exit` | Block until the process exits | No |
-| `resize` | Change terminal dimensions | No |
-| `list_sessions` | List all active sessions | Yes |
-| `close` | Kill process, clean up session | No |
+| Tool | Parameters (defaults) | Read-only |
+|------|-----------------------|-----------|
+| `spawn` | `command`, `cwd?`, `env?`, `cols = 120`, `rows = 30`, `waitMs = 2000` | No |
+| `send_input` | `sessionId`, `text`, `pressEnter = true`, `waitMs = 2000` | No |
+| `send_keys` | `sessionId`, `keys[]`, `delayBetweenMs = 50`, `waitMs = 1500` | No |
+| `get_screen` | `sessionId`, `search?`, `waitMs = 500` | Yes |
+| `wait_for` | `sessionId`, `pattern`, `timeoutMs = 30000`, `intervalMs = 1000` | No |
+| `wait_for_exit` | `sessionId`, `timeoutMs = 30000` | No |
+| `resize` | `sessionId`, `cols`, `rows` | No |
+| `list_sessions` | none | Yes |
+| `close` | `sessionId` | No |
 
-### Typical Flow
+- `spawn` runs the command as `$SHELL -c "<command>"` (`/bin/zsh` when `SHELL` is unset), so pipes, redirects and builtins work. `env` is merged with the current environment. `waitMs` is how long to wait for the first output.
+- `send_input` appends Enter unless `pressEnter` is `false`, which types without submitting (useful for forms and password fields).
+- `send_keys` sends the keys in order with `delayBetweenMs` between them, then waits `waitMs`.
+- `get_screen` waits `waitMs` before capturing (default 500; `0` for an instant capture). `search` is a regex: the result adds the matching lines with 2 lines of context.
+- `wait_for` takes a regex, matched case-insensitively. Use a long `timeoutMs` for builds.
+- `close` sends SIGTERM, then SIGKILL if needed, and returns the final screen.
+- `spawn`, `send_input`, `send_keys` and `close` are annotated as destructive, so clients such as Claude Code ask before using them. `get_screen` and `list_sessions` are annotated read-only.
+- Every result is JSON.
+
+### Keys
+
+`send_keys` accepts: `enter` `tab` `escape` `space` `up` `down` `left` `right` `backspace` `delete` `home` `end` `page_up` `page_down` `f1` to `f12` `ctrl+c` `ctrl+d` `ctrl+z` `ctrl+l` `ctrl+a` `ctrl+e` `ctrl+r` `ctrl+w` `ctrl+u` `ctrl+k` `ctrl+p` `ctrl+n` `y` `n` `0` to `9`
+
+## Resources
+
+- `interactive-cli://sessions`: JSON list of all sessions
+- `interactive-cli://sessions/{sessionId}/screen`: live screen content of a session (text/plain)
+
+## Prompts
+
+Prompt templates for common flows. In Claude Code they appear as slash commands (`/mcp__interactive-cli__eas_build`).
+
+| Prompt | Arguments |
+|--------|-----------|
+| `eas_build` | `platform?` (default `ios`), `profile?` (default `production`), `cwd?` |
+| `ssh_session` | `host` (`user@hostname`), `commands?` (semicolon-separated) |
+| `repl_session` | `command` (`python3`, `node`, `psql`, ...), `setup?` (semicolon-separated) |
+| `docker_interactive` | `image`, `shellCmd?` (default `/bin/sh`) |
+
+`eas_build` runs `eas build --platform <platform> --profile <profile> --auto-submit`. `docker_interactive` runs `docker run -it <image> <shellCmd>`.
+
+## How it works
+
+```mermaid
+graph LR
+    A[AI Agent] <-->|MCP Protocol| B[interactive-cli server]
+    B --> C[Session Manager]
+    C --> D[node-pty<br/><i>real PTY</i>]
+    C --> E[xterm headless<br/><i>screen render</i>]
+    C --> F[Truncation<br/><i>80K limit</i>]
+    D <--> G[Child Process<br/>ssh, eas, python...]
+```
+
+- **node-pty** spawns a real pseudo-terminal (`xterm-256color`), so the child process behaves as it does in your terminal.
+- **xterm headless** keeps a virtual terminal (1,000 lines of scrollback) and renders it into a clean 2D text grid.
+- Screens are capped at 80,000 characters, cut in the middle with a marker so the start and the end survive. Claude Code caps tool results at 100,000.
+
+Typical flow:
 
 ```mermaid
 sequenceDiagram
@@ -85,19 +177,13 @@ sequenceDiagram
     PTY-->>MCP: Initial output
     MCP-->>Agent: sessionId + screen
 
-    Agent->>MCP: get_screen(sessionId)
-    MCP-->>Agent: "Select profile: ❯ dev staging prod"
-
     Agent->>MCP: send_keys(["down","down","enter"])
     MCP->>PTY: ↓ ↓ ⏎
-    PTY-->>MCP: "✔ Selected: production"
+    PTY-->>MCP: "✔ Selected profile: production"
     MCP-->>Agent: updated screen
 
-    Agent->>MCP: wait_for("Build complete|error", 600s)
-    loop Every 1s
-        MCP->>PTY: check output
-    end
-    PTY-->>MCP: "Build complete"
+    Agent->>MCP: wait_for("Build complete|error", 600000)
+    PTY-->>MCP: "✔ Build complete"
     MCP-->>Agent: matched + screen
 
     Agent->>MCP: close(sessionId)
@@ -105,116 +191,22 @@ sequenceDiagram
     MCP-->>Agent: final screen + exit code
 ```
 
-### `spawn`
+## Limits
 
-```typescript
-spawn({
-  command: "ssh user@server.com",   // full command string
-  cwd: "/path/to/project",          // optional working directory
-  env: { "NODE_ENV": "production" }, // optional extra env vars
-  cols: 120,                         // terminal width (default 120)
-  rows: 30,                          // terminal height (default 30)
-  waitMs: 3000,                      // ms to wait for initial output (default 2000)
-})
+- macOS and Linux only. Commands run through your shell (`$SHELL -c`), and Windows is not supported.
+- Any screen in a result is capped at 80,000 characters.
+- Scrollback is 1,000 lines.
+- The agent runs commands with your permissions, in your shell. Review what your client approves.
+
+## Development
+
+```bash
+npm install
+npm run build
+node dist/index.js
 ```
 
-Commands run through your shell (`$SHELL` or `/bin/zsh`), so pipes, redirects, and builtins work.
-
-### `send_input`
-
-```typescript
-send_input({
-  sessionId: "s1",
-  text: "yes",           // text to type
-  pressEnter: true,      // append Enter (default true). false for password fields
-  waitMs: 2000,          // ms to wait for response (default 2000)
-})
-```
-
-### `send_keys`
-
-Send one or more keys in sequence with a small delay between each:
-
-```typescript
-send_keys({
-  sessionId: "s1",
-  keys: ["down", "down", "enter"],  // navigate menu
-  delayBetweenMs: 50,               // ms between keys (default 50)
-  waitMs: 1500,                     // ms to wait after last key (default 1500)
-})
-```
-
-**Supported keys:** `enter` `tab` `escape` `space` `up` `down` `left` `right` `backspace` `delete` `home` `end` `page_up` `page_down` `f1`–`f12` `ctrl+c` `ctrl+d` `ctrl+z` `ctrl+l` `ctrl+a` `ctrl+e` `ctrl+r` `ctrl+w` `ctrl+u` `ctrl+k` `ctrl+p` `ctrl+n` `y` `n` `0`–`9`
-
-### `get_screen`
-
-```typescript
-get_screen({
-  sessionId: "s1",
-  search: "error|warning",  // optional regex to highlight matching lines
-})
-// Returns: { screen, cursor: { row, col }, searchResults, stats }
-```
-
-### `wait_for`
-
-```typescript
-wait_for({
-  sessionId: "s1",
-  pattern: "\\$|#|>",      // regex to match (case-insensitive)
-  timeoutMs: 30000,         // max wait (default 30s)
-  intervalMs: 1000,         // check interval (default 1s)
-})
-// Returns: { matched: true/false, screen, elapsed }
-```
-
-### `wait_for_exit`
-
-```typescript
-wait_for_exit({
-  sessionId: "s1",
-  timeoutMs: 60000,
-})
-// Returns: { alive: false, exitCode: 0, screen }
-```
-
-## Resources
-
-Sessions are exposed as MCP resources:
-
-- `interactive-cli://sessions` — JSON list of all sessions
-- `interactive-cli://sessions/{id}/screen` — live screen content
-
-## Prompt Templates
-
-Pre-built prompt templates for common flows (appear as slash commands in Claude Code):
-
-- **`eas_build`** — EAS build with credential handling
-- **`ssh_session`** — SSH connection with command execution
-- **`repl_session`** — Start a REPL (Python, Node, psql, etc.)
-- **`docker_interactive`** — Run an interactive Docker container
-
-## How It Works
-
-```mermaid
-graph LR
-    A[AI Agent] <-->|MCP Protocol| B[interactive-cli server]
-    B --> C[Session Manager]
-    C --> D[node-pty<br/><i>real PTY</i>]
-    C --> E[xterm headless<br/><i>screen render</i>]
-    C --> F[Truncation<br/><i>80K limit</i>]
-    D <--> G[Child Process<br/>ssh, eas, python...]
-```
-
-- **node-pty** spawns a real pseudo-terminal, so the child process thinks it's talking to a human
-- **xterm headless** maintains a virtual terminal buffer that renders ANSI sequences into a clean 2D text grid
-- Output is truncated at 80K chars (MCP clients like Claude Code cap at 100K) with smart middle-truncation preserving start and end
-- Tool annotations (`readOnlyHint`, `destructiveHint`) tell the client which tools are safe to run in parallel and which need permission
-
-## Requirements
-
-- Node.js >= 18
-- macOS or Linux (node-pty uses native PTY)
+Dependencies: `@modelcontextprotocol/sdk`, `node-pty`, `@xterm/headless`, `zod`.
 
 ## License
 
