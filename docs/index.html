@@ -74,10 +74,10 @@ nav a.l:hover{color:var(--text)}
 .btn:hover{background:var(--raised)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
 .btn.primary:hover{background:var(--accent);filter:brightness(1.07)}
-.btn svg{width:16px;height:16px;fill:currentColor;flex:none}
+.btn svg.fb{width:16px;height:16px;fill:currentColor;flex:none}
 
 /* hero */
-.hero{padding:56px 0 72px}
+.hero{padding:56px 0 72px;position:relative;isolation:isolate}
 .hero .grid{display:grid;grid-template-columns:1fr;gap:48px;align-items:center}
 @media (min-width:960px){.hero{padding:88px 0 96px}.hero .grid{grid-template-columns:1fr 1.05fr;gap:56px}}
 .hero .grid>*{min-width:0}
@@ -87,7 +87,7 @@ h1{font-size:clamp(36px,6.4vw,64px);line-height:1.04;letter-spacing:-0.035em;fon
 .meta{font:400 13px/1.6 var(--mono);color:var(--muted);margin:0}
 
 /* terminal (always dark) */
-.term{background:#0b0d14;border:1px solid rgba(255,255,255,0.14);border-radius:14px;overflow:hidden;color:#e8eaf0;box-shadow:0 24px 60px -24px rgba(0,0,0,0.5)}
+.term{position:relative;background:#0b0d14;border:1px solid rgba(255,255,255,0.14);border-radius:14px;overflow:hidden;color:#e8eaf0;box-shadow:0 24px 60px -24px rgba(0,0,0,0.5)}
 .term .tb{display:flex;align-items:center;gap:8px;background:#12151d;padding:0 14px;min-height:40px;border-bottom:1px solid rgba(255,255,255,0.08)}
 .dots{display:flex;gap:6px;flex:none}
 .dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.18)}
@@ -124,7 +124,7 @@ h2{font-size:clamp(28px,4.2vw,40px);line-height:1.12;letter-spacing:-0.03em;font
 .steps{display:grid;grid-template-columns:1fr;gap:16px;margin:0;padding:0;list-style:none;counter-reset:s}
 @media (min-width:640px){.steps{grid-template-columns:1fr 1fr}}
 @media (min-width:960px){.steps{grid-template-columns:repeat(4,1fr)}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;min-width:0;transition:transform .3s var(--ease),border-color .2s}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;min-width:0;transition:transform .3s var(--ease),border-color .2s}
 .steps .card{counter-increment:s}
 .steps .card::before{content:"0" counter(s);display:block;font:500 12px/1 var(--mono);color:var(--muted);margin-bottom:14px}
 .tn{font:500 13px/1.5 var(--mono);color:var(--accent);margin:0 0 10px;overflow-wrap:anywhere}
@@ -144,7 +144,7 @@ h2{font-size:clamp(28px,4.2vw,40px);line-height:1.12;letter-spacing:-0.03em;font
 
 /* tabs */
 .tabs{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-[role=tablist]{display:flex;gap:4px;padding:8px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:thin}
+[role=tablist]{position:relative;display:flex;gap:4px;padding:8px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:thin}
 [role=tab]{min-height:44px;padding:0 16px;border:0;border-radius:8px;background:transparent;color:var(--text2);font:500 15px/1 var(--sans);cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
 [role=tab]:hover{color:var(--text)}
 [role=tab][aria-selected=true]{background:var(--raised);color:var(--text)}
@@ -153,7 +153,7 @@ h2{font-size:clamp(28px,4.2vw,40px);line-height:1.12;letter-spacing:-0.03em;font
 .cmd{display:flex;align-items:flex-start;gap:12px;background:#0b0d14;border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:14px 14px 14px 16px}
 .cmd pre{margin:0;flex:1;min-width:0;color:#e8eaf0;font:400 13.5px/1.7 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere}
 .cmd pre .pr{color:#3CCFBD;user-select:none}
-.cp{flex:none;min-height:44px;min-width:76px;padding:0 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:#12151d;color:#e8eaf0;font:500 13px/1 var(--sans);cursor:pointer;transition:background .2s,border-color .2s}
+.cp{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;min-width:104px;padding:0 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:#12151d;color:#e8eaf0;font:500 13px/1 var(--sans);cursor:pointer;transition:background .2s,border-color .2s}
 .cp:hover{background:#171b25}
 .cp.copied{border-color:#4ade80;color:#4ade80}
 .note{color:var(--text2);font-size:15px;margin:14px 0 0}
@@ -173,7 +173,50 @@ details p{margin:0 0 20px;color:var(--text2);max-width:44em}
 footer{border-top:1px solid var(--line);padding:36px 0 48px;color:var(--text2);font-size:15px}
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center}
 footer ul{display:flex;gap:8px;list-style:none;margin:0;padding:0}
-footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
+footer a{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 4px}
+
+/* round 2: motion (all of it is gated by JS-added classes or html.js, and off under reduced motion) */
+.ico{display:inline-block;flex:none;width:16px;height:16px;line-height:0;vertical-align:middle}
+.ico.s22{width:22px;height:22px}.ico.s28{width:28px;height:28px}
+.ico svg{display:block}
+.ico svg:not(.fb) path{stroke:currentColor;fill:none;stroke-width:2.6px}
+.card .ico{position:absolute;top:18px;right:18px;color:var(--accent)}
+.tools .sig{padding-right:30px}
+.ico[data-t]{display:none}.has-ico .ico[data-t]{display:inline-block;color:var(--accent)}
+.has-ico summary::after{display:none}
+h1 .rot{display:inline-block;position:relative;overflow:hidden;vertical-align:bottom;white-space:nowrap;color:var(--accent);padding:.06em .05em .14em 0;margin:-.06em -.05em -.14em 0;transition:width 420ms var(--ease)}
+h1 .ch{display:inline-block}
+canvas.dots{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;-webkit-mask-image:radial-gradient(ellipse 72% 80% at 50% 50%,#000 25%,transparent 100%);mask-image:radial-gradient(ellipse 72% 80% at 50% 50%,#000 25%,transparent 100%)}
+#demo{transition:transform 600ms var(--ease)}
+.glare{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(260px circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,0.10),transparent 60%)}
+.sb{display:inline-flex;border-radius:10px}
+.js .sb{position:relative;padding:2px;border-radius:12px;overflow:hidden;isolation:isolate;background:var(--line-strong);transition:transform .25s var(--ease)}
+.js .sb::before{content:"";position:absolute;left:50%;top:50%;width:300%;aspect-ratio:1;z-index:-1;background:conic-gradient(from 0deg,transparent 0 78%,var(--accent) 100%);transform:translate(-50%,-50%);animation:sbr 3.5s linear infinite}
+@keyframes sbr{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.js header.top:not(.sc){background:transparent;border-bottom-color:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+header.top{transition:background .3s,border-color .3s}
+.prog{position:fixed;left:0;top:0;width:100%;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:0 0;z-index:40;pointer-events:none}
+.sw .w{display:inline-block;opacity:0;transform:translateY(.6em);transition:opacity 600ms var(--ease) calc(var(--i)*60ms),transform 600ms var(--ease) calc(var(--i)*60ms)}
+.sw.in .w{opacity:1;transform:none}
+.js .pulse{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.stg:not(.done)>*{opacity:0;transform:translateY(14px);transition:opacity 520ms var(--ease) calc(var(--i)*var(--ms)),transform 520ms var(--ease) calc(var(--i)*var(--ms))}
+.stg.in:not(.done)>*{opacity:1;transform:none}
+.steps{position:relative}
+.steps.dl::after{content:"";position:absolute;z-index:2;pointer-events:none;background:var(--accent);left:0;top:0;width:2px;height:100%;transform:scaleY(0);transform-origin:0 0;transition:transform 900ms var(--ease) 150ms}
+@media (min-width:640px){.steps.dl::after{left:calc(50% - 1px)}}
+@media (min-width:960px){.steps.dl::after{left:0;width:100%;height:2px;transform:scaleX(0)}}
+.steps.dl.in::after{transform:none}
+.sp .card{overflow:hidden}
+.sp .card::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(60,207,189,0.10),transparent 70%)}
+.sp .card:hover{border-color:var(--line-strong)}.sp .card:hover::before{opacity:1}
+.ind{position:absolute;left:0;bottom:0;width:1px;height:2px;background:var(--accent);transform-origin:0 0;transition:transform 300ms var(--ease)}
+.mq{overflow:hidden;display:grid;gap:10px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.mq .track{flex-wrap:nowrap;width:max-content;gap:0;animation:mq 40s linear infinite}
+.mq .rev{animation-direction:reverse}
+.mq li{flex:none;margin-right:10px}
+.mq:hover .track,.mq:focus-within .track{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(-33.3333%)}}
 
 /* fade up */
 /* Hidden only while the reveal script runs (html.js, set in <head>; dropped after 3 s if the script never started), so the page
@@ -200,7 +243,7 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
         <li><a class="l" href="#tools">Tools</a></li>
         <li><a class="l" href="#install">Install</a></li>
         <li><a class="l" href="#faq">FAQ</a></li>
-        <li><a class="btn" href="https://github.com/ohernandezdev/interactive-cli"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Star on GitHub</a></li>
+        <li><a class="btn" href="https://github.com/ohernandezdev/interactive-cli"><span class="ico" data-ico="github" aria-hidden="true"><svg class="fb" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></span>Star on GitHub</a></li>
       </ul>
     </nav>
   </div>
@@ -210,11 +253,11 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
   <div class="hero">
     <div class="wrap grid">
       <div>
-        <h1>Give your AI agent a real terminal</h1>
+        <h1 aria-label="Give your AI agent a real terminal">Give <span class="rot" aria-hidden="true"><span class="rw">your AI agent</span></span> a real terminal</h1>
         <p class="lead">interactive-cli is an MCP server that runs commands in a real pseudo-terminal and hands your agent the rendered screen, so it can answer prompts, pick menu items and drive REPLs, SSH and installers the way you would.</p>
         <div class="cta">
-          <button class="btn primary" type="button" id="heroCopy" data-copy="claude mcp add interactive-cli -- npx -y interactive-cli-mcp"><span class="lbl">Add to Claude Code</span></button>
-          <a class="btn" href="https://github.com/ohernandezdev/interactive-cli">View on GitHub</a>
+          <span class="sb"><button class="btn primary" type="button" id="heroCopy" data-copy="claude mcp add interactive-cli -- npx -y interactive-cli-mcp"><span class="ico" data-ico="copy" aria-hidden="true"></span><span class="lbl">Add to Claude Code</span></button></span>
+          <a class="btn" href="https://github.com/ohernandezdev/interactive-cli"><span class="ico" data-ico="github" aria-hidden="true"></span>View on GitHub</a>
         </div>
         <p class="meta">v1.1.0&nbsp;· MCP&nbsp;server&nbsp;· Node&nbsp;18+&nbsp;· macOS&nbsp;&amp;&nbsp;Linux&nbsp;· MIT</p>
       </div>
@@ -252,10 +295,10 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
       <p class="eyebrow">How it works</p>
       <h2 id="how-h">Four calls, the way you would do it</h2>
       <ol class="steps">
-        <li class="card"><p class="tn">spawn</p><h3>Start it</h3><p>The command runs in a real pseudo-terminal, so it behaves exactly as it does in your terminal.</p></li>
-        <li class="card"><p class="tn">get_screen</p><h3>Read it</h3><p>xterm headless renders the output into the clean text a person sees: menus, prompts, progress bars. No ANSI escape soup.</p></li>
-        <li class="card"><p class="tn">send_input / send_keys</p><h3>Answer it</h3><p>Type a reply, or press keys: arrows, Enter, Tab, Ctrl+C, F1 to F12.</p></li>
-        <li class="card"><p class="tn">wait_for</p><h3>Wait for it</h3><p>Block until a pattern shows up, such as a prompt or "Build complete", so long jobs need no polling.</p></li>
+        <li class="card"><span class="ico s28" data-ico="terminal" aria-hidden="true"></span><p class="tn">spawn</p><h3>Start it</h3><p>The command runs in a real pseudo-terminal, so it behaves exactly as it does in your terminal.</p></li>
+        <li class="card"><span class="ico s28" data-ico="visibility" aria-hidden="true"></span><p class="tn">get_screen</p><h3>Read it</h3><p>xterm headless renders the output into the clean text a person sees: menus, prompts, progress bars. No ANSI escape soup.</p></li>
+        <li class="card"><span class="ico s28" data-ico="command" aria-hidden="true"></span><p class="tn">send_input / send_keys</p><h3>Answer it</h3><p>Type a reply, or press keys: arrows, Enter, Tab, Ctrl+C, F1 to F12.</p></li>
+        <li class="card"><span class="ico s28" data-ico="clock" aria-hidden="true"></span><p class="tn">wait_for</p><h3>Wait for it</h3><p>Block until a pattern shows up, such as a prompt or "Build complete", so long jobs need no polling.</p></li>
       </ol>
     </div>
   </section>
@@ -265,15 +308,15 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
       <p class="eyebrow">Tools</p>
       <h2 id="tools-h">Nine tools</h2>
       <div class="tools">
-        <div class="card"><p class="sig"><b>spawn</b>(command, cwd?, env?, cols = 120, rows = 30, waitMs = 2000)</p><p>Start a command in a real PTY and get the first screen back.</p></div>
-        <div class="card"><p class="sig"><b>send_input</b>(sessionId, text, pressEnter = true, waitMs = 2000)</p><p>Type text and press Enter. Set pressEnter to false to type without submitting.</p></div>
-        <div class="card"><p class="sig"><b>send_keys</b>(sessionId, keys[], delayBetweenMs = 50, waitMs = 1500)</p><p>Press keys in sequence: arrows, Enter, Tab, Ctrl combos, F1 to F12.</p></div>
-        <div class="card"><p class="sig"><b>get_screen</b>(sessionId, search?, waitMs = 500)<span class="chip">read-only</span></p><p>Capture the current screen. With search (a regex), get the matching lines with 2 lines of context.</p></div>
-        <div class="card"><p class="sig"><b>wait_for</b>(sessionId, pattern, timeoutMs = 30000, intervalMs = 1000)</p><p>Block until a regex (case-insensitive) matches the output, or time out.</p></div>
-        <div class="card"><p class="sig"><b>wait_for_exit</b>(sessionId, timeoutMs = 30000)</p><p>Wait for the process to end and get the final screen and exit code.</p></div>
-        <div class="card"><p class="sig"><b>resize</b>(sessionId, cols, rows)</p><p>Change the terminal size so TUIs can reflow their content.</p></div>
-        <div class="card"><p class="sig"><b>list_sessions</b>()<span class="chip">read-only</span></p><p>List every session with its status, uptime and activity.</p></div>
-        <div class="card"><p class="sig"><b>close</b>(sessionId)</p><p>SIGTERM, then SIGKILL if needed. Returns the final screen.</p></div>
+        <div class="card"><span class="ico s22" data-ico="terminal" aria-hidden="true"></span><p class="sig"><b>spawn</b>(command, cwd?, env?, cols = 120, rows = 30, waitMs = 2000)</p><p>Start a command in a real PTY and get the first screen back.</p></div>
+        <div class="card"><span class="ico s22" data-ico="edit" aria-hidden="true"></span><p class="sig"><b>send_input</b>(sessionId, text, pressEnter = true, waitMs = 2000)</p><p>Type text and press Enter. Set pressEnter to false to type without submitting.</p></div>
+        <div class="card"><span class="ico s22" data-ico="command" aria-hidden="true"></span><p class="sig"><b>send_keys</b>(sessionId, keys[], delayBetweenMs = 50, waitMs = 1500)</p><p>Press keys in sequence: arrows, Enter, Tab, Ctrl combos, F1 to F12.</p></div>
+        <div class="card"><span class="ico s22" data-ico="visibility" aria-hidden="true"></span><p class="sig"><b>get_screen</b>(sessionId, search?, waitMs = 500)<span class="chip">read-only</span></p><p>Capture the current screen. With search (a regex), get the matching lines with 2 lines of context.</p></div>
+        <div class="card"><span class="ico s22" data-ico="clock" aria-hidden="true"></span><p class="sig"><b>wait_for</b>(sessionId, pattern, timeoutMs = 30000, intervalMs = 1000)</p><p>Block until a regex (case-insensitive) matches the output, or time out.</p></div>
+        <div class="card"><span class="ico s22" data-ico="log-out" aria-hidden="true"></span><p class="sig"><b>wait_for_exit</b>(sessionId, timeoutMs = 30000)</p><p>Wait for the process to end and get the final screen and exit code.</p></div>
+        <div class="card"><span class="ico s22" data-ico="maximize-2" aria-hidden="true"></span><p class="sig"><b>resize</b>(sessionId, cols, rows)</p><p>Change the terminal size so TUIs can reflow their content.</p></div>
+        <div class="card"><span class="ico s22" data-ico="list" aria-hidden="true"></span><p class="sig"><b>list_sessions</b>()<span class="chip">read-only</span></p><p>List every session with its status, uptime and activity.</p></div>
+        <div class="card"><span class="ico s22" data-ico="x-square" aria-hidden="true"></span><p class="sig"><b>close</b>(sessionId)</p><p>SIGTERM, then SIGKILL if needed. Returns the final screen.</p></div>
       </div>
       <p class="also">Resources: <code>interactive-cli://sessions</code> and <code>interactive-cli://sessions/{id}/screen</code>. Prompts: <code>eas_build</code>, <code>ssh_session</code>, <code>repl_session</code>, <code>docker_interactive</code> (slash commands in Claude Code).</p>
     </div>
@@ -291,10 +334,10 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
           <button role="tab" id="t4" aria-controls="p4" aria-selected="false" tabindex="-1">Any MCP client</button>
         </div>
         <div role="tabpanel" id="p1" aria-labelledby="t1">
-          <div class="cmd"><pre><code>claude mcp add interactive-cli -- npx -y interactive-cli-mcp</code></pre><button class="cp" type="button" aria-label="Copy the Claude Code command">Copy</button></div>
+          <div class="cmd"><pre><code>claude mcp add interactive-cli -- npx -y interactive-cli-mcp</code></pre><button class="cp" type="button" aria-label="Copy the Claude Code command"><span class="ico" data-ico="copy" aria-hidden="true"></span><span class="lbl">Copy</span></button></div>
         </div>
         <div role="tabpanel" id="p2" aria-labelledby="t2" hidden>
-          <div class="cmd"><pre><code>codex mcp add interactive-cli -- npx -y interactive-cli-mcp</code></pre><button class="cp" type="button" aria-label="Copy the Codex command">Copy</button></div>
+          <div class="cmd"><pre><code>codex mcp add interactive-cli -- npx -y interactive-cli-mcp</code></pre><button class="cp" type="button" aria-label="Copy the Codex command"><span class="ico" data-ico="copy" aria-hidden="true"></span><span class="lbl">Copy</span></button></div>
           <p class="note">This writes <code>[mcp_servers.interactive-cli]</code> with <code>command = "npx"</code> and <code>args = ["-y", "interactive-cli-mcp"]</code> to <code>~/.codex/config.toml</code>.</p>
         </div>
         <div role="tabpanel" id="p3" aria-labelledby="t3" hidden>
@@ -305,11 +348,11 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
       "args": ["-y", "interactive-cli-mcp"]
     }
   }
-}</code></pre><button class="cp" type="button" aria-label="Copy the Cursor config">Copy</button></div>
+}</code></pre><button class="cp" type="button" aria-label="Copy the Cursor config"><span class="ico" data-ico="copy" aria-hidden="true"></span><span class="lbl">Copy</span></button></div>
           <p class="note">Save it as <code>~/.cursor/mcp.json</code>.</p>
         </div>
         <div role="tabpanel" id="p4" aria-labelledby="t4" hidden>
-          <div class="cmd"><pre><code>npx -y interactive-cli-mcp</code></pre><button class="cp" type="button" aria-label="Copy the stdio command">Copy</button></div>
+          <div class="cmd"><pre><code>npx -y interactive-cli-mcp</code></pre><button class="cp" type="button" aria-label="Copy the stdio command"><span class="ico" data-ico="copy" aria-hidden="true"></span><span class="lbl">Copy</span></button></div>
           <p class="note">Point any stdio MCP client at this command.</p>
         </div>
       </div>
@@ -342,8 +385,8 @@ footer a{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}
   <div class="wrap">
     <span>MIT licensed. Made by <a href="https://hernandezbastos.es">Omar Hernández Bastos</a></span>
     <ul>
-      <li><a href="https://www.npmjs.com/package/interactive-cli-mcp">npm</a></li>
-      <li><a href="https://github.com/ohernandezdev/interactive-cli">GitHub</a></li>
+      <li><a href="https://www.npmjs.com/package/interactive-cli-mcp">npm<span class="ico" data-ico="external-link" aria-hidden="true"></span></a></li>
+      <li><a href="https://github.com/ohernandezdev/interactive-cli"><span class="ico" data-ico="github" aria-hidden="true"></span>GitHub</a></li>
     </ul>
   </div>
 </footer>
@@ -382,7 +425,7 @@ function wire(btn,getText,lblEl,idle){
 var hero=document.getElementById("heroCopy");
 wire(hero,function(){return hero.getAttribute("data-copy")},hero.querySelector(".lbl"),"Add to Claude Code");
 Array.prototype.forEach.call(document.querySelectorAll(".cp"),function(b){
-  wire(b,function(){return b.parentNode.querySelector("code").textContent},b,"Copy");
+  wire(b,function(){return b.parentNode.querySelector("code").textContent},b.querySelector(".lbl"),"Copy");
 });
 
 /* ---------- tabs ---------- */
@@ -392,8 +435,11 @@ function selectTab(t,focus){
     var on=x===t;
     x.setAttribute("aria-selected",on);
     x.tabIndex=on?0:-1;
-    document.getElementById(x.getAttribute("aria-controls")).hidden=!on;
+    var pn=document.getElementById(x.getAttribute("aria-controls"));
+    var was=pn.hidden;pn.hidden=!on;
+    if(on&&was&&!reduce&&pn.animate)pn.animate([{opacity:0},{opacity:1}],{duration:200,easing:"ease-out"});
   });
+  moveInd();
   if(focus)t.focus();
 }
 tabs.forEach(function(t,i){
@@ -486,6 +532,327 @@ if(reduce||!("IntersectionObserver" in window)){
     es.forEach(function(e){if(e.isIntersecting){if(!running)play()}else stop()});
   },{threshold:0.15}).observe(document.getElementById("demo"));
 }
+
+/* ===================== Round 2: motion ===================== */
+var $=function(q,r){return (r||document).querySelector(q)},$$=function(q,r){return Array.prototype.slice.call((r||document).querySelectorAll(q))};
+var fine=!!(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches);
+var EASE="cubic-bezier(0.22, 1, 0.36, 1)";
+var heroEl=$(".hero"),heroVis=true,hd=$("header.top");
+
+/* tab indicator (also under reduced motion: it only repositions) */
+var ind=el("span","ind");$("[role=tablist]").appendChild(ind);
+function moveInd(){var t=$("[role=tab][aria-selected=true]");if(t)ind.style.transform="translateX("+t.offsetLeft+"px) scaleX("+t.offsetWidth+")"}
+moveInd();addEventListener("resize",moveInd);addEventListener("load",moveInd);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(moveInd);
+
+/* nav blur once scrolled; progress bar */
+var pg=null;
+if(!reduce){pg=el("div","prog");pg.setAttribute("aria-hidden","true");document.body.appendChild(pg)}
+function onScroll(){
+  hd.classList.toggle("sc",scrollY>8);
+  if(pg){var m=document.documentElement.scrollHeight-innerHeight;pg.style.transform="scaleX("+(m>0?Math.min(1,scrollY/m):0)+")"}
+}
+addEventListener("scroll",onScroll,{passive:true});onScroll();
+
+/* icons: lottie-web light player, useanimations files */
+var PP={visibility:1,edit:1},resolveIcons,iconsReady=new Promise(function(r){resolveIcons=r});
+function run(n){var a=n._a;if(!a||reduce||n._t)return;n._r=n._pp?1:0;a.setDirection(1);a.goToAndPlay(0,true)}
+function tog(n,open){
+  var a=n._a;if(!a||n._o===open)return;n._o=open;
+  if(reduce){a.goToAndStop(open?a.totalFrames-1:0,true);return}
+  a.setDirection(open?1:-1);a.play();
+}
+function loadIcons(){
+  var cache={};
+  function data(id){return cache[id]||(cache[id]=fetch("assets/icons/"+id+".json").then(function(r){return r.json()}))}
+  return Promise.all($$(".ico[data-ico]").map(function(n){
+    var id=n.getAttribute("data-ico");
+    return data(id).then(function(d){
+      var a=lottie.loadAnimation({container:n,renderer:"svg",loop:false,autoplay:false,animationData:JSON.parse(JSON.stringify(d))});
+      n._a=a;n._pp=PP[id];n._t=n.hasAttribute("data-t");
+      var done=function(){
+        var fb=$(".fb",n);if(fb)n.removeChild(fb);
+        a.goToAndStop(0,true);
+        var dt=n.closest("details");if(dt)dt.classList.add("has-ico");
+      };
+      if(a.isLoaded)done();else a.addEventListener("DOMLoaded",done);
+      a.addEventListener("complete",function(){
+        if(n._r){n._r=0;a.setDirection(-1);a.play()}else if(!n._t)a.setDirection(1);
+      });
+      if(!n._t&&!reduce){
+        var h=n.closest(".btn,.cp,.card,a");
+        if(h&&!h._h){h._h=1;
+          ["mouseenter","focusin","pointerdown"].forEach(function(ev){
+            h.addEventListener(ev,function(){$$(".ico",h).forEach(run)},{passive:true});
+          });
+        }
+      }
+    }).catch(function(){});
+  }));
+}
+function bootIcons(){
+  var s=document.createElement("script");
+  s.src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie_light.min.js";
+  s.async=true;
+  s.onload=function(){loadIcons().then(resolveIcons,resolveIcons)};
+  document.head.appendChild(s);
+}
+
+/* FAQ: plus-to-x icon and animated height */
+$$("details").forEach(function(d){
+  var sm=d.firstElementChild,p=sm.nextElementSibling,ic=el("span","ico s22");
+  ic.setAttribute("data-ico","plus-to-x");ic.setAttribute("data-t","1");ic.setAttribute("aria-hidden","true");
+  sm.appendChild(ic);
+  d.addEventListener("toggle",function(){tog(ic,d.open)});
+  if(reduce)return;
+  sm.addEventListener("click",function(e){
+    e.preventDefault();
+    if(d._a){d._a.cancel();d._a=null;p.style.overflow=""}
+    var open=!d.open,mb=getComputedStyle(p).marginBottom;
+    if(open)d.open=true;else tog(ic,false);
+    var h=p.offsetHeight;
+    p.style.overflow="hidden";
+    var k=[{height:"0px",opacity:0,marginBottom:"0px"},{height:h+"px",opacity:1,marginBottom:mb}];
+    var a=p.animate(open?k:k.slice().reverse(),{duration:240,easing:EASE,fill:"forwards"});
+    d._a=a;
+    a.onfinish=function(){d._a=null;a.cancel();p.style.overflow="";if(!open)d.open=false};
+  });
+});
+
+/* hero dot grid (static dots under reduced motion) */
+var cv=el("canvas","dots");cv.setAttribute("aria-hidden","true");heroEl.insertBefore(cv,heroEl.firstChild);
+var cx=cv.getContext("2d"),W=0,H=0,dpr=1,ac=[60,207,189],raf=0,last=0,idle=0;
+var mqL=matchMedia("(prefers-color-scheme: light)");
+var P={x:-999,y:-999,tx:-999,ty:-999,s:0,g:0};
+function col(){var v=getComputedStyle(document.documentElement).getPropertyValue("--accent").trim(),h=parseInt(v.slice(1),16);if(!isNaN(h))ac=[h>>16,h>>8&255,h&255]}
+function size(){
+  var r=heroEl.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(devicePixelRatio||1,2);
+  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cx.setTransform(dpr,0,0,dpr,0,0);col();paintDots(0);
+}
+function dots(list,rgb,a){
+  if(!list.length)return;
+  cx.fillStyle="rgba("+rgb+","+a+")";cx.beginPath();
+  for(var i=0;i<list.length;i+=2){cx.moveTo(list[i]+1.5,list[i+1]);cx.arc(list[i],list[i+1],1.5,0,6.2832)}
+  cx.fill();
+}
+/* Not "draw": that name is the demo terminal's (above), and a second declaration in this scope would replace it. */
+function paintDots(now){
+  cx.clearRect(0,0,W,H);
+  var G=26,R=160,b=mqL.matches?[17,24,39]:[255,255,255],bs=b.join(",");
+  var near=fine&&!reduce&&P.s>0.01,B=[[],[],[],[],[],[]],flat=[],list=[];
+  for(var y=G/2;y<H;y+=G)for(var x=G/2;x<W;x+=G){
+    if(reduce){flat.push(x,y);continue}
+    if(fine){
+      var dx=x-P.x,dy=y-P.y,d2=dx*dx+dy*dy;
+      if(near&&d2<R*R){list.push(x,y,dx,dy,Math.sqrt(d2));continue}
+      flat.push(x,y);
+    }else{
+      B[Math.round((0.5+0.5*Math.sin(6.2832*now/6000-(x+y)/260))*5)].push(x,y);
+    }
+  }
+  if(fine||reduce)dots(flat,bs,0.10);
+  else for(var k=0;k<6;k++)dots(B[k],bs,(0.05+0.13*k/5).toFixed(3));
+  for(var i=0;i<list.length;i+=5){
+    var u=list[i+4]||1,t=Math.pow(1-u/R,2)*P.s;
+    var c=[0,1,2].map(function(j){return Math.round(b[j]+(ac[j]-b[j])*t)});
+    cx.fillStyle="rgba("+c.join(",")+","+(0.10+0.88*t).toFixed(3)+")";
+    cx.beginPath();cx.arc(list[i]+list[i+2]/u*8*t,list[i+1]+list[i+3]/u*8*t,1.5+1.3*t,0,6.2832);cx.fill();
+  }
+}
+function loop(now){
+  raf=requestAnimationFrame(loop);
+  if(fine){
+    if(!P.g&&P.s<0.01){if(!idle){P.s=0;paintDots(now);idle=1}return}
+    idle=0;
+  }else if(now-last<33)return;
+  last=now;
+  P.x+=(P.tx-P.x)*0.25;P.y+=(P.ty-P.y)*0.25;P.s+=(P.g-P.s)*0.12;
+  paintDots(now);
+}
+function syncHero(){
+  var go=heroVis&&!document.hidden;
+  if(go&&!raf)raf=requestAnimationFrame(loop);else if(!go&&raf){cancelAnimationFrame(raf);raf=0}
+}
+if("ResizeObserver" in window)new ResizeObserver(size).observe(heroEl);else{size();addEventListener("resize",size)}
+if(mqL.addEventListener)mqL.addEventListener("change",function(){col();paintDots(0)});
+if(!reduce){
+  document.addEventListener("visibilitychange",syncHero);
+  if("IntersectionObserver" in window)new IntersectionObserver(function(es){heroVis=es[0].isIntersecting;syncHero()}).observe(heroEl);
+  syncHero();
+  if(fine){
+    heroEl.addEventListener("pointermove",function(e){
+      if(e.pointerType!=="mouse")return;
+      var r=heroEl.getBoundingClientRect();P.tx=e.clientX-r.left;P.ty=e.clientY-r.top;
+      if(P.s<0.01){P.x=P.tx;P.y=P.ty}P.g=1;
+    },{passive:true});
+    heroEl.addEventListener("pointerleave",function(){P.g=0},{passive:true});
+  }
+}
+
+if(!reduce){
+  var eio="IntersectionObserver" in window?new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){eio.unobserve(e.target);e.target._f()}});
+  },{threshold:0.15}):null;
+  var onEnter=function(n,fn){if(eio){n._f=fn;eio.observe(n)}else fn()};
+
+  /* rotating text in the h1 */
+  (function(){
+    var h1=$("h1"),rot=$(".rot"),items=["Claude Code","Codex","Cursor","your AI agent"],cur=3,rw;
+    function mk(t){
+      var d=el("span","rw"),cs=[];d.style.display="inline-block";
+      for(var i=0;i<t.length;i++){var c=el("span","ch",t[i]===" "?" ":t[i]);d.appendChild(c);cs.push(c)}
+      d.cs=cs;return d;
+    }
+    rot.textContent="";rw=mk(items[cur]);rot.appendChild(rw);
+    function fit(){
+      h1.style.minHeight="";
+      var p=h1.cloneNode(true),pr=$(".rot",p),m=0;
+      p.removeAttribute("aria-label");
+      p.style.cssText="position:absolute;visibility:hidden;left:0;top:0;margin:0;width:"+h1.clientWidth+"px";
+      document.body.appendChild(p);
+      items.forEach(function(t){pr.textContent=t;pr.style.width="";m=Math.max(m,p.offsetHeight)});
+      document.body.removeChild(p);
+      h1.style.minHeight=m+"px";
+      if(rot.style.width)rot.style.width=rw.offsetWidth+"px";
+    }
+    var rt;addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(fit,150)});
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+    fit();
+    function swap(){
+      if(!heroVis||document.hidden)return;
+      var n=(cur+1)%items.length,old=rw,nw=mk(items[n]);
+      rot.style.width=old.offsetWidth+"px";
+      nw.style.position="absolute";nw.style.left="0";nw.style.top="0";
+      rot.appendChild(nw);
+      var w=nw.offsetWidth;
+      nw.cs.forEach(function(c,i){c.animate([{transform:"translateY(100%)",opacity:0},{transform:"none",opacity:1}],{duration:420,delay:i*30,easing:EASE,fill:"both"})});
+      old.cs.forEach(function(c,i){c.animate([{transform:"none",opacity:1},{transform:"translateY(-100%)",opacity:0}],{duration:420,delay:i*30,easing:EASE,fill:"forwards"})});
+      void rot.offsetWidth;rot.style.width=w+"px";
+      rw=nw;cur=n;
+      setTimeout(function(){if(old.parentNode)rot.removeChild(old);nw.style.position="";nw.style.left="";nw.style.top=""},420+30*Math.max(old.cs.length,nw.cs.length)+40);
+    }
+    setInterval(swap,2600);
+  })();
+
+  /* tilted demo terminal */
+  if(fine){
+    var dm=$("#demo"),gl=el("div","glare");dm.appendChild(gl);
+    dm.addEventListener("pointermove",function(e){
+      if(e.pointerType!=="mouse")return;
+      var r=dm.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+      dm.style.transition="transform 120ms ease-out";
+      dm.style.transform="perspective(1000px) rotateX("+((0.5-y)*10).toFixed(2)+"deg) rotateY("+((x-0.5)*10).toFixed(2)+"deg)";
+      gl.style.setProperty("--gx",(x*100).toFixed(1)+"%");gl.style.setProperty("--gy",(y*100).toFixed(1)+"%");gl.style.opacity=1;
+    },{passive:true});
+    dm.addEventListener("pointerleave",function(){dm.style.transition="";dm.style.transform="";gl.style.opacity=0},{passive:true});
+  }
+
+  /* hero button: magnet and click spark (the travelling border is CSS) */
+  var sb=$(".sb"),mx=0,my=0,hb=$("#heroCopy");
+  if(fine){
+    document.addEventListener("pointermove",function(e){
+      if(!heroVis||e.pointerType!=="mouse")return;
+      var r=sb.getBoundingClientRect(),l=r.left-mx,t=r.top-my,rr=r.right-mx,bt=r.bottom-my;
+      var ex=Math.max(l-e.clientX,0,e.clientX-rr),ey=Math.max(t-e.clientY,0,e.clientY-bt),d=Math.hypot(ex,ey);
+      if(d<80){
+        var dx=e.clientX-(l+rr)/2,dy=e.clientY-(t+bt)/2,u=Math.hypot(dx,dy)||1,f=5*(1-d/80);
+        mx=dx/u*f;my=dy/u*f;sb.style.transform="translate("+mx.toFixed(2)+"px,"+my.toFixed(2)+"px)";
+      }else if(mx||my){mx=my=0;sb.style.transform=""}
+    },{passive:true});
+  }
+  hb.addEventListener("click",function(e){
+    var r=hb.getBoundingClientRect(),x=e.detail?e.clientX:r.left+r.width/2,y=e.detail?e.clientY:r.top+r.height/2;
+    for(var i=0;i<8;i++)(function(i){
+      var l=el("i"),g=i*45+"deg";
+      l.style.cssText="position:fixed;left:"+x+"px;top:"+y+"px;width:9px;height:2px;margin-top:-1px;border-radius:2px;background:var(--accent);pointer-events:none;z-index:60;transform-origin:0 50%";
+      document.body.appendChild(l);
+      var a=l.animate([{transform:"rotate("+g+") translateX(10px)",opacity:1},{transform:"rotate("+g+") translateX(36px) scaleX(0.3)",opacity:0}],{duration:400,easing:"ease-out"});
+      a.onfinish=function(){l.remove()};
+    })(i);
+  });
+
+  /* eyebrows decrypt, headings split into words */
+  $$(".eyebrow").forEach(function(n){
+    var t=n.textContent;
+    onEnter(n,function(){
+      var s=el("span"),C="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",t0=Date.now(),id;
+      s.setAttribute("aria-hidden","true");n.textContent="";n.appendChild(el("span","sr",t));n.appendChild(s);
+      function tick(){
+        var p=Math.min(1,(Date.now()-t0)/700),k=Math.floor(p*t.length),o="";
+        for(var i=0;i<t.length;i++)o+=(i<k||t[i]===" ")?t[i]:C[Math.random()*36|0];
+        s.textContent=o;
+        if(p>=1){clearInterval(id);n.textContent=t}
+      }
+      tick();id=setInterval(tick,35);
+    });
+  });
+  $$("h2").forEach(function(h){
+    var w=h.textContent.split(" ");h.textContent="";
+    w.forEach(function(x,i){
+      var s=el("span","w",x);s.style.setProperty("--i",i);h.appendChild(s);
+      if(i<w.length-1)h.appendChild(document.createTextNode(" "));
+    });
+    h.classList.add("sw");onEnter(h,function(){h.classList.add("in")});
+  });
+
+  /* the problem terminal types "npm init" */
+  var pt=$(".term.small .screen");
+  if(pt){
+    var L=$$(".ln",pt),n0=L[0].lastChild,c0=el("span","cur"),word="npm init";
+    n0.textContent=" ";L[0].appendChild(c0);L[1].style.visibility="hidden";L[2].style.visibility="hidden";
+    onEnter(pt,function(){
+      var i=0,id=setInterval(function(){
+        n0.textContent=" "+word.slice(0,++i);
+        if(i>=word.length){
+          clearInterval(id);
+          setTimeout(function(){
+            L[0].removeChild(c0);L[1].style.visibility="";
+            setTimeout(function(){L[2].style.visibility="";L[2].classList.add("pulse")},350);
+          },250);
+        }
+      },50);
+    });
+  }
+
+  /* staggered cards, accent line, spotlight, icons play as cards enter */
+  function stagger(g,ms){
+    var k=g.children;
+    for(var i=0;i<k.length;i++)k[i].style.setProperty("--i",i);
+    g.style.setProperty("--ms",ms+"ms");g.classList.add("stg");
+    onEnter(g,function(){
+      g.classList.add("in");
+      iconsReady.then(function(){
+        $$(".ico",g).forEach(function(n,i){setTimeout(function(){run(n)},i*ms+300)});
+      });
+      setTimeout(function(){g.classList.add("done")},k.length*ms+800);
+    });
+  }
+  var steps=$(".steps"),tl=$(".tools");
+  steps.classList.add("dl");stagger(steps,90);stagger(tl,60);
+  if(fine){
+    tl.classList.add("sp");
+    $$(".card",tl).forEach(function(c){
+      c.addEventListener("pointermove",function(e){
+        var r=c.getBoundingClientRect();
+        c.style.setProperty("--mx",(e.clientX-r.left)+"px");c.style.setProperty("--my",(e.clientY-r.top)+"px");
+      },{passive:true});
+    });
+  }
+
+  /* Good for: two marquee rows */
+  (function(){
+    var ul=$(".chips"),par=ul.parentNode,mq=el("div","mq"),li=$$("li",ul),c;
+    mq.tabIndex=0;mq.setAttribute("role","group");mq.setAttribute("aria-label","Good for");
+    par.insertBefore(mq,ul);mq.appendChild(ul);ul.classList.add("track");
+    for(c=0;c<2;c++)li.forEach(function(x){var y=x.cloneNode(true);y.setAttribute("aria-hidden","true");ul.appendChild(y)});
+    var r2=el("ul","chips track rev");r2.setAttribute("aria-hidden","true");
+    for(c=0;c<3;c++)li.slice().reverse().forEach(function(x){r2.appendChild(x.cloneNode(true))});
+    r2.style.animationDelay="-12s";mq.appendChild(r2);
+  })();
+}
+
+/* lottie loads after the load event (under reduced motion too: frame 0, never played) */
+if(document.readyState==="complete")bootIcons();else addEventListener("load",bootIcons);
 })();
 </script>
 </body>

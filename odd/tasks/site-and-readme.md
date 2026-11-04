@@ -99,6 +99,54 @@ transcript of calls and screens); "Tools" (table with parameters and defaults, r
 Linux only, 80,000-character cap, scrollback 1,000 lines, the agent runs commands with your permissions); "Development" (npm
 install, npm run build, run from dist); "License".
 
+## Round 2: motion (Omar, after the preview: "falta muchísimo motion y useanimations y react micro animations")
+
+The site stays vanilla (no React, no build): the React Bits effects are rebuilt in plain JS/CSS. Everything below is off under
+`prefers-reduced-motion: reduce` (static page, icons at their first frame).
+
+- R2.1 Animated icons: useanimations.com Lottie files (MIT) in docs/assets/icons/*.json, played by lottie-web 5.12.2's light SVG
+  player from `https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie_light.min.js`, loaded after the load event
+  (also under reduced motion, then shown still at frame 0). Each icon box keeps its size before the player arrives (no layout
+  shift). Recolour by CSS: `.ico svg path { stroke: currentColor; fill: none }`, stroke-width 2.6 in the files' 32-unit space.
+  Rendered first and last frames (2026-11-04): `visibility` and `edit` end on another state, so they play to the end and back;
+  `plus-to-x` is a toggle (forward on open, backward on close); the other ten end as they start and play once. Placement:
+  nav "Star on GitHub" github; hero "Add to Claude Code" copy (plays on click), "View on GitHub" github; How it works cards (28 px,
+  accent) terminal, visibility, command, clock; tool cards (22 px, accent) spawn terminal, send_input edit, send_keys command,
+  get_screen visibility, wait_for clock, wait_for_exit log-out, resize maximize-2, list_sessions list, close x-square; install copy
+  buttons copy; FAQ indicator plus-to-x; footer GitHub github, npm external-link. Icons in cards play once when the card enters the
+  viewport (with its stagger) and again on hover and focus; buttons on hover, focus and press.
+- R2.2 Hero: (a) rotating text: the h1 reads "Give {Claude Code | Codex | Cursor | your AI agent} a real terminal", the rotating
+  part in --accent, 2.6 s per item; outgoing characters slide up and fade (translateY 0 -> -100 %, 30 ms stagger), incoming slide
+  in from +100 % (30 ms stagger), 420 ms each, cubic-bezier(0.22, 1, 0.36, 1); the rotating span's width eases to the new item's
+  measured width. The h1's accessible name stays "Give your AI agent a real terminal" (aria-label; the animated span aria-hidden).
+  Reduced motion: "your AI agent", still. (b) Background: a cursor-reactive dot grid on a canvas behind the hero ("Dot Grid"):
+  1.5 px dots every 26 px, base rgba(255,255,255,0.10) (light: rgba(17,24,39,0.10)); within 160 px of the pointer the dots move
+  toward --accent and are pushed out up to 6 px, with a smooth falloff; without a fine pointer, a slow diagonal brightness wave
+  (6 s period); DPR-aware; paused when the hero is off screen or the tab hidden; faded out at the edges by a radial mask.
+  (c) The demo terminal tilts toward the pointer ("Tilted Card"): at most 5 degrees, perspective 1000 px, a soft glare that follows
+  the pointer, back to flat in 600 ms on leave; fine pointers only. (d) "Add to Claude Code": a light travelling around its border
+  every 3.5 s ("Star Border", a conic-gradient arc of --accent), a 5 px magnet toward the pointer within 80 px, and a click spark
+  (8 short --accent lines from the click point, 400 ms).
+- R2.3 Sections: (a) eyebrow labels decrypt when they enter ("Decrypted Text": characters cycle through A-Z and 0-9 and resolve left
+  to right in 700 ms); (b) section headings reveal word by word ("Split Text": each word from translateY 0.6em and opacity 0, 60 ms
+  stagger, 600 ms); (c) the problem terminal types "npm init" at 50 ms per character when it enters, then prints
+  "package name: (my-app)" and the blinking cursor; "waiting for input…" pulses between opacity 0.5 and 1 every 1.6 s; (d) How it
+  works: cards stagger in (90 ms) and an accent line through the four cards draws in 900 ms (left to right on wide screens, top to
+  bottom when stacked); (e) tool cards: stagger in (60 ms) and a spotlight on hover ("Spotlight Card": a 240 px radial gradient of
+  rgba(60,207,189,0.10) under the pointer, border to --line-strong); (f) install tabs: an --accent indicator slides under the active
+  tab (300 ms) and the panel cross-fades (200 ms); (g) Good for: two marquee rows of the chips moving in opposite directions, 40 s
+  per loop, paused on hover and focus, faded at the edges; (h) FAQ: the answer's height animates (240 ms) with the plus-to-x icon;
+  (i) a 2 px --accent scroll-progress bar at the top; the nav gets a blurred background and a bottom border once scrolled past 8 px.
+- R2.4 Performance: one requestAnimationFrame loop for the canvas, running only while the hero is visible; passive listeners;
+  transform and opacity only; the added JS under 25 KB unminified.
+
+- Round 2 evidence: the writer added R2.1-R2.4 (docs/index.html 53 KB, about 12.5 KB of new JS). QA found a page error in every
+  setup: the dot grid declared a second `function draw`, which replaced the demo terminal's `draw` (one scope), so the demo called
+  the grid before its canvas existed and lost its own rendering; renamed to paintDots. Then 0 console errors and no horizontal
+  scroll in all six setups. Interaction frames (Chromium 1440 x 900): the demo terminal tilts with its glare, the h1 rotates
+  ("Give Codex a real terminal"), the tool card spotlight follows the pointer, the FAQ opens with plus-to-x; the dot grid reacted
+  too faintly, so the dots near the pointer now grow to 2.8 px, reach 0.98 alpha and move out 8 px (frame checked).
+
 ## Acceptance
 
 - docs/index.html renders with no console error in Chromium and WebKit, light and dark, at 1440 x 900, 393 x 852 and 320 x 640, no
